@@ -1,0 +1,31 @@
+# archivo de variables para el proyecto
+# Kubernetes Variables
+K8S_NAMESPACE=tech-prod
+K8S_NET_POLICY=tech-prod
+K8S_DEPLOYMENT_NAME=fastapi-app
+K8S_IMAGE_NAME=fastapi-app
+K8S_SERVICE_NAME=fastapi-app
+K8S_SERVICE_PORT=80
+K8S_TARGET_PORT=8000
+K8S_RESOURCE_LIMIT_MEMORY=3Gi
+K8S_RESOURCE_REQUEST_MEMORY=1Gi
+K8S_INGRESS_NAME=fastapi-app-ingress
+
+# Azure DevOps Variables
+AZURE_PYTHON_VERSION=3.9
+AZURE_IMAGE_REGISTRY=luisog207/python-fastapi
+AZURE_IMAGE_NAME=python-fastapi
+AZURE_IMAGE_TAG=$(Build.BuildId)
+AZURE_SNYK_SERVICE_CONNECTION=snyk
+AZURE_SNYK_TEST_TYPE=container
+AZURE_SNYK_DOCKER_IMAGE_NAME=python-fastapi
+AZURE_SNYK_DOCKERFILE_PATH=Dockerfile
+
+# Cloudflare Worker Variables
+CLOUDFLARE_WORKER_ACCOUNT_ID
+CLOUDFLARE_WORKER_NAME=test-devops-worker
+CLOUDFLARE_WORKER_SCRIPT_NAME=worker.js
+CLOUDFLARE_ACCOUNT_ID=""
+CLOUDFLARE_API_TOKEN=""
+
+workers_dev = true
