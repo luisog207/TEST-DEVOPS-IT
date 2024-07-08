@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fastapi-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: fastapi-app
+  template:
+    metadata:
+      labels:
+        app: fastapi-app
+    spec:
+      containers:
+      - name: fastapi-app
+        image: luisog207/python-fastapi:34
+        resources:
+          limits:
+            memory: "3Gi"        
+          requests:
+            memory: "1Gi"           
+        ports:
+        - containerPort: 8000
