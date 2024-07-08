@@ -1,19 +1,68 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
+# Name of the pipeline
+# Created by Luis Oviedo
+name: $(Build.DefinitionName)
 
 trigger:
-- main
+  branches:
+    include:
+      - main
 
 pool:
-  vmImage: ubuntu-latest
+  vmImage: 'ubuntu-latest'
 
-steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+variables:
+  pythonVersion: '3.9'
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+stages:
+  - stage: Build
+    displayName: 'Build and App Tests'
+    jobs:
+      - job: Build
+        displayName: 'Build and Test'
+        steps:
+          - task: UsePythonVersion@0
+            inputs:
+              versionSpec: '$(pythonVersion)'
+              addToPath: true
+
+          - script: |
+              python -m venv venv
+              source venv/bin/activate
+              python -m pip install --upgrade pip
+              pip install -r requirements.txt
+              pip install pytest
+              pip install pytest-cov              
+            displayName: 'Install dependencies'
+
+          - script: |
+              source venv/bin/activate
+              pytest --cov=./test --cov-report=xml --doctest-modules
+            displayName: 'Run unit tests'
+          - task: SnykSecurityScan@1
+            inputs:
+              serviceConnectionEndpoint: 'snyk'
+              testType: 'code'
+              failOnIssues: false            
+            displayName: 'Snyk Code SecurityScan'
+  - stage: BuildDockerImage
+    displayName: 'Build Docker Image'
+    jobs:
+      - job: Docker
+        displayName: 'Build and Store Docker Image'
+        steps:
+          - task: Docker@2
+            inputs:
+              containerRegistry: 'python-fastapi'
+              repository: 'luisog207/python-fastapi'
+              command: 'buildAndPush'
+              Dockerfile: '**/Dockerfile'
+            displayName: 'Docker build and Push'              
+          - task: SnykSecurityScan@1
+            inputs:
+              serviceConnectionEndpoint: 'snyk'
+              testType: 'container'
+              dockerImageName: 'luisog207/python-fastapi'
+              dockerfilePath: 'Dockerfile'
+              monitorWhen: 'always'
+              failOnIssues: false
+            displayName: 'Snyk Test Container Image'
